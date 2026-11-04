@@ -30,7 +30,7 @@
         <p class="hero-lede">Containment has failed. The quarantine zone is overrun. Deploy your field tech, protect the relay, and make it through the night.</p>
         <div class="hero-actions">
           <button id="play-solo" class="btn btn-primary"><b>▶</b> SOLO DEPLOYMENT</button>
-          <button id="open-armory" class="btn btn-secondary">FIELD GEAR <span>↗</span></button>
+          <button id="open-armory" class="btn btn-secondary">WEAPON ARMORY <span>↗</span></button>
         </div>
         <div class="hero-stats">
           <div><b>04</b><span>OPERATORS / SQUAD</span></div>
@@ -81,13 +81,13 @@
   </main>
 
   <section id="armory-screen" class="screen subscreen hidden">
-    <div class="sub-head"><div><div class="eyebrow"><span></span> 02 / EQUIPMENT BAY</div><h2>FIELD <em>GEAR</em></h2><p class="muted">Inspect your survival tools. Drag the model to rotate it.</p></div><button class="back-button" data-back>✕ BACK</button></div>
+    <div class="sub-head"><div><div class="eyebrow"><span></span> 02 / EQUIPMENT BAY</div><h2>WEAPON <em>ARMORY</em></h2><p class="muted">Inspect each weapon, rotate the model, and test its unique optic.</p></div><button class="back-button" data-back>✕ BACK</button></div>
     <div class="armory-layout">
-      <div class="preview-panel"><div class="preview-top"><span>3D INSPECTION // LIVE MODEL</span><b id="preview-mode">PULSE GAUNTLET</b></div><canvas id="preview-canvas"></canvas><div class="preview-foot"><span>DRAG TO ROTATE</span><span>SCROLL TO ZOOM</span></div></div>
-      <div class="gear-info"><div id="gear-category" class="eyebrow">FIELD TOOL / PRIMARY</div><h3 id="gear-name">PULSE GAUNTLET</h3><p id="gear-desc" class="muted">A focused resonance pulse that disrupts nearby infected and restores a little breathing room.</p>
-        <div class="gear-stats"><div><span>RANGE</span><b id="gear-range">32m</b></div><div><span>COOLDOWN</span><b id="gear-cooldown">0.4s</b></div><div><span>CHARGE</span><b id="gear-charge">∞</b></div></div>
-        <div class="gear-note"><span>FIELD FUNCTION</span><strong id="gear-function">DIRECT DISRUPTION</strong><p id="gear-note">A precise pulse can destabilize a target before it reaches the operator.</p></div>
-        <button id="equip-gear" class="btn btn-primary">SET ACTIVE TOOL</button><div id="gear-status" class="gear-status">CURRENT LOADOUT</div>
+      <div class="preview-panel"><div class="preview-top"><span>3D INSPECTION // LIVE MODEL</span><b id="preview-mode">RANGER AR</b></div><canvas id="preview-canvas"></canvas><div class="preview-foot"><span>DRAG TO ROTATE</span><span>SCROLL TO ZOOM</span></div></div>
+      <div class="gear-info"><div id="gear-category" class="eyebrow">ASSAULT RIFLE / PRIMARY</div><h3 id="gear-name">RANGER AR</h3><p id="gear-desc" class="muted">A balanced all-rounder with a crisp reflex optic.</p>
+        <div class="gear-stats"><div><span>DAMAGE</span><b id="gear-range">34</b></div><div><span>FIRE RATE</span><b id="gear-cooldown">520 RPM</b></div><div><span>MAGAZINE</span><b id="gear-charge">30</b></div></div>
+        <div class="gear-note"><span>OPTIC CONFIGURATION</span><strong id="gear-function">REFLEX / 1.5X</strong><p id="gear-note">Wide sight picture for close and mid-range engagements.</p></div>
+        <button id="equip-gear" class="btn btn-primary">SELECT LOADOUT</button><div id="gear-status" class="gear-status">CURRENT LOADOUT</div>
       </div>
       <div id="gear-list" class="gear-list"></div>
     </div>
@@ -115,10 +115,11 @@
     <div id="damage-vignette" class="damage-vignette"></div>
     <div class="hud-bottom">
       <div class="player-card"><div class="avatar">OP</div><div><span>OPERATOR / 09</span><strong><b id="player-health">100</b><small>HP</small></strong><div class="health-track"><i id="health-fill"></i></div></div></div>
-      <div class="tool-card"><div class="tool-charge"><strong id="tool-charge">READY</strong><small id="tool-cooldown">FIELD TOOL</small></div><div class="tool-label"><b id="active-tool">PULSE GAUNTLET</b><span id="tool-function">DIRECT DISRUPTION</span></div><div class="tool-key">LMB</div></div>
-      <div class="field-tip"><span>FIELD NOTE</span><b id="field-note">USE YOUR GEAR TO HOLD SPACE.</b><small>WASD MOVE · SHIFT SPRINT · SPACE JUMP</small></div>
+      <div class="ammo-card"><div class="ammo-count"><strong id="ammo-current">30</strong><span>/ <b id="ammo-reserve">120</b></span></div><div class="ammo-name"><b id="active-tool">RANGER AR</b><span id="tool-function">REFLEX 1.5X</span></div><button id="reload-button" class="reload-key">R <small>RELOAD</small></button></div>
+      <div class="field-tip"><span>FIELD NOTE</span><b id="field-note">AIM CAREFULLY. WATCH YOUR AMMO.</b><small>WASD MOVE · SHIFT SPRINT · SPACE JUMP</small></div>
     </div>
-    <div id="mobile-controls" class="mobile-controls"><div id="move-stick" class="move-stick"><div id="stick-knob"></div></div><div id="look-zone" class="look-zone"></div><div class="mobile-actions"><button id="mobile-gear" class="mobile-primary">USE</button><button id="mobile-scan">SCAN</button><button id="mobile-beacon">G</button></div></div>
+    <div id="mobile-controls" class="mobile-controls"><div id="move-stick" class="move-stick"><div id="stick-knob"></div></div><div id="look-zone" class="look-zone"></div><div class="mobile-actions"><button id="mobile-aim">ADS</button><button id="mobile-reload">R</button><button id="mobile-fire" class="mobile-primary">FIRE</button></div></div>
+    <div id="scope-overlay" class="scope-overlay hidden"><div class="scope-window"><i></i><b></b><span id="scope-label">REFLEX 1.5X</span></div></div>
     <div id="pause-menu" class="modal hidden"><div class="modal-card"><div class="eyebrow"><span></span> OPERATION PAUSED</div><h2>HOLD THE <em>LINE.</em></h2><p>Press ESC to return to the field.</p><button id="resume-button" class="btn btn-primary">RESUME OPERATION</button><button id="leave-button" class="btn btn-secondary">RETURN TO BASE</button></div></div>
     <div id="game-over" class="modal hidden"><div class="modal-card"><div class="eyebrow"><span></span> SIGNAL LOST</div><h2>OPERATION <em>FAILED.</em></h2><p id="final-stats">You reached wave 1.</p><button id="retry-button" class="btn btn-primary">REDEPLOY</button><button id="menu-button" class="btn btn-secondary">RETURN TO BASE</button></div></div>
     <div id="toast" class="toast hidden"></div>
