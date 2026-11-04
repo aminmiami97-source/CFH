@@ -1,6 +1,6 @@
 # DEAD SIGNAL — Zombie Survival
 
-A browser-based 3D first-person wave-survival prototype built with Three.js and PeerJS.
+A browser-based 3D first-person zombie wave-survival prototype built with Three.js and PeerJS.
 
 ## Run locally
 
@@ -17,17 +17,25 @@ Open `http://localhost:8000`.
 - `WASD`: move; mouse: look.
 - Left mouse button: fire; right mouse button: aim through the equipped optic.
 - `R`: reload; `Shift`: sprint; `Space`: jump; `Escape`: pause / release pointer.
-- `1`, `2`, `3`: switch weapon.
+- `1`–`7`: select weapon. On touchscreens, use the **SWAP** button.
 - Touch devices: movement stick, look area, fire, ADS and reload controls.
 
 ## Current prototype
 
 - Procedural Three.js quarantine facility with humanoid infected and a larger boss model.
-- First-person weapon handling, simulated hitscan shooting, reloads, aim-down-sights, tracers and hit feedback.
-- Three original fictional weapons: Ranger AR (reflex 1.5x), Vulture DMR (4x optic), and Breach SMG (holographic 2x).
+- First-person handling, hitscan shooting, reloads, weapon-specific ADS zoom, muzzle flashes, tracers and hit feedback.
+- Seven fictional weapons with distinct procedural silhouettes and optic profiles:
+  - Ranger AR — reflex 1.5x
+  - Vulture DMR — variable 4x
+  - Breach SMG — holographic 2x
+  - Wraith 12G — prism 1.25x
+  - Titan LMG — combat 1.8x
+  - Nova 9 sidearm — micro dot 1x
+  - Phantom Carbine — LPVO 2.5x
 - Rotating 3D weapon previews in the armory.
 - Endless enemy waves. A boss spawns on waves 5, 10, 15, and every fifth wave thereafter.
 - Solo play and peer-to-peer rooms for up to four operators.
+- Responsive touchscreen movement, look, ADS, fire, reload and weapon swapping.
 - In-page zombie-themed field log / changelog.
 
 ## Co-op
