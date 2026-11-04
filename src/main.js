@@ -403,8 +403,7 @@ function aim(on){
   const w=WEAPONS[state.selectedWeapon],zoom=on?w.zoom:1;
   $("scope-overlay").classList.toggle("hidden",!on);$("crosshair").classList.toggle("hidden",on);
   $("scope-label").textContent=w.optic;
-  $("scope-overlay").classList.toggle("scope-reflex",on&&w.opticType==="reflex");
-  $("scope-overlay").classList.toggle("scope-holo",on&&w.opticType==="holo");
+  ["reflex","holo","scope","prism","combat","micro","lpvo"].forEach(type=>$("scope-overlay").classList.toggle("scope-"+type,on&&w.opticType===type));
   state.camera.fov=on?76/zoom:76;state.camera.updateProjectionMatrix();
   if(state.weaponModel){state.weaponModel.position.x=on ? 0.05 : 0.3;state.weaponModel.position.y=on ? -0.2 : -0.27;}
 }
@@ -507,7 +506,7 @@ function bindControls(){
   document.addEventListener("keydown",e=>{
     state.keys[e.code]=true;if(["Space","ArrowUp","ArrowDown","ArrowLeft","ArrowRight"].includes(e.code))e.preventDefault();
     if(e.code==="Escape"&&state.running&&!state.paused)pauseGame();if(e.code==="KeyR")reload();
-    if(e.code==="Digit1")switchWeapon(0);if(e.code==="Digit2")switchWeapon(1);if(e.code==="Digit3")switchWeapon(2);
+    if(e.code.startsWith("Digit")){const slot=Number(e.code.slice(5));if(slot>=1&&slot<=7)switchWeapon(slot-1);}
   });
   document.addEventListener("keyup",e=>state.keys[e.code]=false);
   document.addEventListener("mousedown",e=>{
