@@ -516,6 +516,7 @@ function bindControls(){
   document.addEventListener("mouseup",e=>{if(e.button===0)state.firing=false;if(e.button===2)aim(false);});
   document.addEventListener("contextmenu",e=>e.preventDefault());
   $("reload-button").addEventListener("click",reload);$("mobile-reload").addEventListener("click",reload);
+  $("mobile-swap").addEventListener("click",()=>switchWeapon((state.selectedWeapon+1)%WEAPONS.length));
   $("mobile-fire").addEventListener("pointerdown",e=>{e.preventDefault();state.firing=true;shoot();});
   ["pointerup","pointercancel","pointerleave"].forEach(ev=>$("mobile-fire").addEventListener(ev,()=>state.firing=false));
   $("mobile-aim").addEventListener("pointerdown",e=>{e.preventDefault();aim(true);});
