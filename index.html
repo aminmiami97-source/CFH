@@ -1,0 +1,131 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
+  <meta name="theme-color" content="#090d0c">
+  <meta name="description" content="DEAD SIGNAL — survive the infected, hold the line, and keep your squad online.">
+  <title>DEAD SIGNAL — Quarantine Protocol</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@500;600;700;800;900&family=DM+Mono:wght@400;500&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="./styles.css">
+  <script src="https://unpkg.com/peerjs@1.5.4/dist/peerjs.min.js"></script>
+</head>
+<body>
+<div id="app">
+  <div id="world"></div>
+  <div class="vignette"></div>
+  <header class="topbar">
+    <a class="brand" href="#" aria-label="Dead Signal home"><span class="brand-mark"><i></i><i></i><i></i></span><span>DEAD<span>SIGNAL</span></span></a>
+    <div class="top-status"><i class="status-dot"></i><span id="connection-label">SYSTEM STANDBY</span></div>
+    <div class="build">FIELD BUILD <b>0.1.0</b><span class="status-square"></span></div>
+  </header>
+
+  <main id="main-menu" class="screen menu-screen">
+    <section class="hero">
+      <div class="hero-copy">
+        <div class="eyebrow"><span></span> BLACKSITE // SECTOR 09 <span></span></div>
+        <h1>THE DEAD<br><em>DON'T</em> REST.</h1>
+        <p class="hero-lede">Containment has failed. The quarantine zone is overrun. Deploy your field tech, protect the relay, and make it through the night.</p>
+        <div class="hero-actions">
+          <button id="play-solo" class="btn btn-primary"><b>▶</b> SOLO DEPLOYMENT</button>
+          <button id="open-armory" class="btn btn-secondary">WEAPON ARMORY <span>↗</span></button>
+        </div>
+        <div class="hero-stats">
+          <div><b>04</b><span>OPERATORS / SQUAD</span></div>
+          <div><b>05</b><span>WAVE BOSS INTERVAL</span></div>
+          <div><b>∞</b><span>THREAT LEVEL</span></div>
+        </div>
+      </div>
+      <div class="hero-visual">
+        <div class="radar-ring ring-a"></div><div class="radar-ring ring-b"></div><div class="radar-ring ring-c"></div>
+        <div class="radar-cross"></div>
+        <div class="hero-label label-top">BIOHAZARD DETECTED <b>●</b></div>
+        <div class="hero-label label-bottom">SECTOR 09 / QUARANTINE ACTIVE</div>
+        <div class="hero-zombie"><i class="z-head"></i><i class="z-neck"></i><i class="z-torso"></i><i class="z-arm left"></i><i class="z-arm right"></i><i class="z-leg left"></i><i class="z-leg right"></i></div>
+        <div class="visual-code">DS-09<br>NO EXTRACTION<br>NO SAFE ZONE</div>
+      </div>
+    </section>
+
+    <section class="lower-grid">
+      <article class="panel deployment">
+        <div class="panel-top"><span>01 / DEPLOYMENT</span><b>MISSION READY</b></div>
+        <h2>CHOOSE YOUR DROP</h2>
+        <p class="muted">Play alone or create a squad room. Your browser runs the battlefield.</p>
+        <div class="mode-grid">
+          <button id="host-game" class="mode-card">
+            <span class="mode-glyph">⌁</span><strong>HOST SQUAD</strong><small>Create a room and invite up to 3 others.</small><i>↗</i>
+          </button>
+          <button id="show-join" class="mode-card">
+            <span class="mode-glyph">⌖</span><strong>JOIN SQUAD</strong><small>Enter a host code to join their operation.</small><i>↗</i>
+          </button>
+        </div>
+        <div id="join-row" class="join-row">
+          <input id="room-code" type="text" maxlength="48" placeholder="ENTER ROOM CODE" spellcheck="false" autocomplete="off">
+          <button id="join-game" class="btn btn-small">CONNECT</button>
+        </div>
+        <div id="network-status" class="network-status">Co-op requires an internet connection. Share your room code with your squad.</div>
+        <div id="host-room" class="host-room hidden"><span>YOUR SQUAD ROOM</span><strong id="host-code">CONNECTING…</strong><button id="copy-code" class="copy-btn">COPY CODE</button></div>
+      </article>
+      <article class="panel intel">
+        <div class="panel-top"><span>02 / FIELD INTEL</span><b class="amber">THREAT RISING</b></div>
+        <div class="intel-feature"><div class="hazard">☣</div><div><h3>THE HOLLOWED</h3><p>Infected converge on the nearest operator. Keep moving and use your field gear to create space.</p></div></div>
+        <div class="intel-line"><span>WAVES 01 — 04</span><b>SCOUT CLASS</b></div>
+        <div class="intel-line"><span>WAVES 05 — 09</span><b>ARMORED CLASS</b></div>
+        <div class="intel-line"><span>EVERY 05 WAVES</span><b class="red">BOSS CONTACT</b></div>
+        <button id="open-log" class="text-link">OPEN FIELD LOG <span>→</span></button>
+      </article>
+    </section>
+    <footer class="footer"><span>DEAD SIGNAL © 2026</span><span>KEEP YOUR COMMS OPEN. TRUST NO FOOTSTEPS.</span><span>CO-OP / SURVIVAL</span></footer>
+  </main>
+
+  <section id="armory-screen" class="screen subscreen hidden">
+    <div class="sub-head"><div><div class="eyebrow"><span></span> 02 / EQUIPMENT BAY</div><h2>WEAPON <em>ARMORY</em></h2><p class="muted">Inspect each weapon, rotate the model, and test its unique optic.</p></div><button class="back-button" data-back>✕ BACK</button></div>
+    <div class="armory-layout">
+      <div class="preview-panel"><div class="preview-top"><span>3D INSPECTION // LIVE MODEL</span><b id="preview-mode">RANGER AR</b></div><canvas id="preview-canvas"></canvas><div class="preview-foot"><span>DRAG TO ROTATE</span><span>SCROLL TO ZOOM</span></div></div>
+      <div class="gear-info"><div id="gear-category" class="eyebrow">ASSAULT RIFLE / PRIMARY</div><h3 id="gear-name">RANGER AR</h3><p id="gear-desc" class="muted">A balanced all-rounder with a crisp reflex optic.</p>
+        <div class="gear-stats"><div><span>DAMAGE</span><b id="gear-range">34</b></div><div><span>FIRE RATE</span><b id="gear-cooldown">520 RPM</b></div><div><span>MAGAZINE</span><b id="gear-charge">30</b></div></div>
+        <div class="gear-note"><span>OPTIC CONFIGURATION</span><strong id="gear-function">REFLEX / 1.5X</strong><p id="gear-note">Wide sight picture for close and mid-range engagements.</p></div>
+        <button id="equip-gear" class="btn btn-primary">SELECT LOADOUT</button><div id="gear-status" class="gear-status">CURRENT LOADOUT</div>
+      </div>
+      <div id="gear-list" class="gear-list"></div>
+    </div>
+  </section>
+
+  <section id="log-screen" class="screen subscreen hidden">
+    <div class="sub-head"><div><div class="eyebrow"><span></span> 03 / ARCHIVED TRANSMISSIONS</div><h2>FIELD <em>LOG</em></h2><p class="muted">Operational updates from the quarantine zone.</p></div><button class="back-button" data-back>✕ BACK</button></div>
+    <div class="log-list">
+      <article class="log-entry latest"><div class="log-version">V0.1.0<small>INITIAL DEPLOYMENT</small></div><div><h3>THE OUTBREAK BEGINS</h3><p>First playable build. 3D first-person arena, solo survival, squad rooms, seven selectable weapons with distinct optics, rotating 3D armory previews, and a boss encounter every fifth wave.</p></div><time>04 NOV 2026</time></article>
+      <article class="log-entry"><div class="log-version">SYSTEM<small>FIELD INTEL</small></div><div><h3>THREAT PROTOCOL</h3><p>Infected become more numerous and resilient as waves progress. A boss-class target arrives on waves 5, 10, 15, and every fifth wave after that.</p></div><time>ACTIVE</time></article>
+      <article class="log-entry"><div class="log-version">SYSTEM<small>NETWORK</small></div><div><h3>SQUAD LINK</h3><p>Host a room and share its code. Up to four operators can connect through PeerJS data connections and defend the same sector.</p></div><time>ACTIVE</time></article>
+    </div>
+    <div class="log-warning"><span>☣</span><div><b>TRANSMISSION WARNING</b><p>Early prototype. Co-op requires internet access and PeerJS signaling. The host must keep the game tab open; this is not a dedicated anti-cheat server.</p></div></div>
+  </section>
+
+  <section id="hud" class="hud hidden">
+    <div class="hud-top">
+      <div class="wave-card"><span>CURRENT OPERATION</span><strong>WAVE <b id="wave-number">01</b></strong><small id="wave-phase">PREPARING</small></div>
+      <div class="objective"><i class="status-dot"></i><b id="objective-text">PREPARE FOR CONTACT</b><small id="enemy-count">HOSTILES: 0</small></div>
+      <div class="squad-card"><span>SQUAD LINK</span><strong id="squad-count">01 / 04</strong><small id="network-mode">SOLO SESSION</small></div>
+    </div>
+    <div id="boss-bar" class="boss-bar hidden"><div><span>☣ PRIORITY TARGET</span><b id="boss-name">THE WARDEN</b></div><div class="boss-track"><i id="boss-fill"></i></div></div>
+    <div id="crosshair" class="crosshair"><i></i><i></i><i></i><i></i><b></b></div>
+    <div id="hit-marker" class="hit-marker hidden">✳</div>
+    <div id="damage-vignette" class="damage-vignette"></div>
+    <div class="hud-bottom">
+      <div class="player-card"><div class="avatar">OP</div><div><span>OPERATOR / 09</span><strong><b id="player-health">100</b><small>HP</small></strong><div class="health-track"><i id="health-fill"></i></div></div></div>
+      <div class="ammo-card"><div class="ammo-count"><strong id="ammo-current">30</strong><span>/ <b id="ammo-reserve">120</b></span></div><div class="ammo-name"><b id="active-tool">RANGER AR</b><span id="tool-function">REFLEX 1.5X</span></div><button id="reload-button" class="reload-key">R <small>RELOAD</small></button></div>
+      <div class="field-tip"><span>FIELD NOTE</span><b id="field-note">AIM CAREFULLY. WATCH YOUR AMMO.</b><small>WASD MOVE · SHIFT SPRINT · SPACE JUMP</small></div>
+    </div>
+    <div id="mobile-controls" class="mobile-controls"><div id="move-stick" class="move-stick"><div id="stick-knob"></div></div><div id="look-zone" class="look-zone"></div><div class="mobile-actions"><button id="mobile-swap">SWAP</button><button id="mobile-aim">ADS</button><button id="mobile-reload">R</button><button id="mobile-fire" class="mobile-primary">FIRE</button></div></div>
+    <div id="scope-overlay" class="scope-overlay hidden"><div class="scope-window"><i></i><b></b><span id="scope-label">REFLEX 1.5X</span></div></div>
+    <div id="pause-menu" class="modal hidden"><div class="modal-card"><div class="eyebrow"><span></span> OPERATION PAUSED</div><h2>HOLD THE <em>LINE.</em></h2><p>Press ESC to return to the field.</p><button id="resume-button" class="btn btn-primary">RESUME OPERATION</button><button id="leave-button" class="btn btn-secondary">RETURN TO BASE</button></div></div>
+    <div id="game-over" class="modal hidden"><div class="modal-card"><div class="eyebrow"><span></span> SIGNAL LOST</div><h2>OPERATION <em>FAILED.</em></h2><p id="final-stats">You reached wave 1.</p><button id="retry-button" class="btn btn-primary">REDEPLOY</button><button id="menu-button" class="btn btn-secondary">RETURN TO BASE</button></div></div>
+    <div id="toast" class="toast hidden"></div>
+    <div id="scan-overlay" class="scan-overlay hidden"><div class="scan-frame"><span>RESONANCE SCAN</span><i></i><b>SCANNING…</b></div></div>
+  </section>
+  <div id="loading-screen" class="loading-screen"><div class="loading-icon">☣</div><strong>DEAD SIGNAL</strong><div class="loading-track"><i></i></div><small>INITIALIZING QUARANTINE ZONE…</small></div>
+</div>
+<script type="module" src="./src/main.js"></script>
+</body></html>
