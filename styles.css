@@ -27,3 +27,32 @@
 .scope-window b{position:absolute;left:50%;top:50%;width:36%;height:36%;border:1px solid rgba(208,226,207,.28);border-radius:50%;transform:translate(-50%,-50%)}
 .scope-window span{position:absolute;z-index:3;bottom:12%;left:50%;transform:translateX(-50%);font:8px var(--mono);letter-spacing:1px;color:#d7e6d6;white-space:nowrap}
 @media(max-width:680px){.ammo-card{gap:7px;padding:6px}.ammo-count{font-size:24px}.ammo-name{min-width:64px}.ammo-name b{font-size:8px}.ammo-name span{font-size:5px}.reload-key{display:none}.scope-window{width:70vw;height:70vw}}
+
+
+/* Each selected weapon has its own optic silhouette while aiming. */
+.scope-overlay.scope-reflex .scope-window{width:min(36vw,310px);height:min(36vw,310px);border-width:2px}
+.scope-overlay.scope-reflex .scope-window:before,.scope-overlay.scope-reflex .scope-window:after{opacity:.28}
+.scope-overlay.scope-reflex .scope-window i{width:5px;height:5px;background:#ff655c;border:0;box-shadow:0 0 8px #ff655c}
+.scope-overlay.scope-holo .scope-window{border-radius:20px;border-width:2px}
+.scope-overlay.scope-holo .scope-window b{width:28%;height:28%;border-color:rgba(255,102,91,.7)}
+.scope-overlay.scope-holo .scope-window i{width:5px;height:5px;background:#ff655c;border:0}
+.scope-overlay.scope-scope .scope-window{border-radius:48%;border-width:5px}
+.scope-overlay.scope-scope .scope-window b{width:55%;height:55%;border-color:rgba(208,226,207,.42)}
+.scope-overlay.scope-prism .scope-window{width:min(42vw,350px);height:min(42vw,350px);border-radius:16%;border-width:3px}
+.scope-overlay.scope-prism .scope-window b{width:18%;height:18%;border-radius:0;border-color:rgba(255,116,93,.72);transform:translate(-50%,-50%) rotate(45deg)}
+.scope-overlay.scope-prism .scope-window i{width:0;height:0;border:0;border-left:5px solid transparent;border-right:5px solid transparent;border-bottom:9px solid #ff725f;border-radius:0;background:transparent}
+.scope-overlay.scope-combat .scope-window{width:min(38vw,330px);height:min(38vw,330px);border-radius:14%;border-width:3px}
+.scope-overlay.scope-combat .scope-window b{width:23%;height:23%;border-color:rgba(198,236,154,.75)}
+.scope-overlay.scope-micro .scope-window{width:min(29vw,250px);height:min(29vw,250px);border-width:2px}
+.scope-overlay.scope-micro .scope-window:before,.scope-overlay.scope-micro .scope-window:after{opacity:.2}
+.scope-overlay.scope-micro .scope-window i{width:5px;height:5px;background:#ff655c;border:0}
+.scope-overlay.scope-lpvo .scope-window{border-radius:34%;border-width:3px}
+.scope-overlay.scope-lpvo .scope-window b{width:45%;height:45%;border-color:rgba(208,226,207,.48)}
+@media(max-width:680px){
+  .mobile-actions{gap:5px;right:10px}
+  .mobile-actions button{width:43px;height:43px;font-size:7px}
+  .mobile-actions .mobile-primary{width:60px;height:60px}
+  .scope-overlay.scope-reflex .scope-window{width:48vw;height:48vw}
+  .scope-overlay.scope-micro .scope-window{width:38vw;height:38vw}
+  .scope-overlay.scope-combat .scope-window{width:54vw;height:54vw}
+}
