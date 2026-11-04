@@ -4,9 +4,13 @@ const $ = id => document.getElementById(id);
 const WORLD = $("world");
 
 const WEAPONS = [
-  {id:"ranger",name:"RANGER AR",role:"ASSAULT RIFLE / PRIMARY",description:"Balanced automatic platform with a clear reflex optic and dependable handling.",damage:34,rpm:520,mag:30,reserve:150,optic:"REFLEX 1.5X",zoom:1.5,opticType:"reflex",spread:.012,color:0x46564b},
-  {id:"vulture",name:"VULTURE DMR",role:"DESIGNATED MARKSMAN / PRECISION",description:"A precision platform with a long-range optic and deliberate semi-automatic fire.",damage:108,rpm:165,mag:12,reserve:72,optic:"VARIABLE 4X",zoom:4,opticType:"scope",spread:.002,color:0x555d51},
-  {id:"breach",name:"BREACH SMG",role:"SUBMACHINE GUN / CLOSE QUARTERS",description:"Compact, fast handling and fitted with a wide holographic sight for quick target changes.",damage:23,rpm:860,mag:36,reserve:180,optic:"HOLO 2X",zoom:2,opticType:"holo",spread:.019,color:0x3d4b45}
+  {id:"ranger",name:"RANGER AR",role:"ASSAULT RIFLE / PRIMARY",description:"Balanced automatic platform with a clear reflex optic and dependable handling.",damage:34,rpm:520,mag:30,reserve:150,optic:"REFLEX 1.5X",zoom:1.5,opticType:"reflex",spread:.012,color:0x46564b,platform:"rifle"},
+  {id:"vulture",name:"VULTURE DMR",role:"DESIGNATED MARKSMAN / PRECISION",description:"A precision platform with a long-range variable optic and deliberate semi-automatic fire.",damage:108,rpm:165,mag:12,reserve:72,optic:"VARIABLE 4X",zoom:4,opticType:"scope",spread:.002,color:0x555d51,platform:"dmr"},
+  {id:"breach",name:"BREACH SMG",role:"SUBMACHINE GUN / CLOSE QUARTERS",description:"Compact, fast handling and fitted with a wide holographic sight for quick target changes.",damage:23,rpm:860,mag:36,reserve:180,optic:"HOLO 2X",zoom:2,opticType:"holo",spread:.019,color:0x3d4b45,platform:"smg"},
+  {id:"wraith",name:"WRAITH 12G",role:"PUMP SHOTGUN / CLOSE DEFENCE",description:"A heavy close-range platform with a compact prism optic and a wide, deliberate shot.",damage:92,rpm:92,mag:8,reserve:64,optic:"PRISM 1.25X",zoom:1.25,opticType:"prism",spread:.055,color:0x514b3d,platform:"shotgun"},
+  {id:"titan",name:"TITAN LMG",role:"LIGHT MACHINE GUN / SUPPORT",description:"A support weapon with a high-capacity feed and a rugged low-profile combat optic.",damage:27,rpm:690,mag:75,reserve:300,optic:"COMBAT 1.8X",zoom:1.8,opticType:"combat",spread:.022,color:0x414b43,platform:"lmg"},
+  {id:"nova",name:"NOVA 9",role:"COMPACT SIDEARM / SECONDARY",description:"A light secondary with a compact micro optic and quick handling.",damage:29,rpm:410,mag:17,reserve:102,optic:"MICRO DOT 1X",zoom:1,opticType:"micro",spread:.014,color:0x555d57,platform:"pistol"},
+  {id:"phantom",name:"PHANTOM CARBINE",role:"TACTICAL CARBINE / VERSATILE",description:"A short tactical carbine with a low-power variable optic for flexible mid-range play.",damage:31,rpm:640,mag:24,reserve:144,optic:"LPVO 2.5X",zoom:2.5,opticType:"lpvo",spread:.009,color:0x48564c,platform:"carbine"}
 ];
 
 const state = {
@@ -38,55 +42,99 @@ const cloth=texture("#374238",17),pantsTexture=texture("#303a34",42);
 
 function createWeapon(def){
   const g=new THREE.Group();
-  const receiver=material(def.color,.53,.4),dark=material(0x171f1b,.72,.4),steel=material(0x7a857d,.32,.82),rubber=material(0x202723,.95),lens=new THREE.MeshStandardMaterial({color:0x91bdab,metalness:.65,roughness:.12,transparent:true,opacity:.6,emissive:0x183a2a,emissiveIntensity:.45});
-  // Receiver, handguard and upper housing.
-  box(g,.24,.2,.63,receiver,0,0,0);
-  box(g,.23,.13,.3,dark,0,.11,-.22);
-  box(g,.22,.18,.22,receiver,0,-.02,.42);
-  // Stock and butt pad.
-  box(g,.19,.16,.34,dark,0,.01,.76);
-  box(g,.22,.22,.07,rubber,0,-.015,.94);
-  // Grip and magazine.
-  const grip=box(g,.13,.34,.16,rubber,0,-.23,.22);grip.rotation.x=-.18;
-  const magH=def.id==="vulture"?.43:.38,magW=def.id==="breach"?.14:.18;
-  const mag=box(g,magW,magH,.22,dark,0,-.29,-.08);mag.rotation.x=-.12;
-  for(let i=0;i<5;i++)box(g,magW+.01,.014,.012,steel,0,-.13-i*.054,-.195,false);
-  // Forward assembly and barrel.
-  box(g,.2,.17,.48,receiver,0,.015,-.5);
-  const barrel=new THREE.Mesh(new THREE.CylinderGeometry(.035,.045,.7,14),steel);barrel.rotation.x=Math.PI/2;barrel.position.set(0,.02,-.92);g.add(barrel);
-  const muzzle=new THREE.Mesh(new THREE.CylinderGeometry(.052,.04,.13,14),dark);muzzle.rotation.x=Math.PI/2;muzzle.position.set(0,.02,-1.29);g.add(muzzle);
-  box(g,.27,.06,.16,dark,0,.13,-.54);
-  // Top and side rails, screws and vents.
-  box(g,.22,.035,.74,dark,0,.14,-.08);
-  for(let i=0;i<7;i++)box(g,.23,.012,.035,steel,0,.165,.18-i*.09,false);
-  for(let side of [-1,1]){
+  const receiver=material(def.color,.53,.4),dark=material(0x171f1b,.72,.4),steel=material(0x7a857d,.32,.82),rubber=material(0x202723,.95);
+  const lens=new THREE.MeshStandardMaterial({color:0x91bdab,metalness:.65,roughness:.12,transparent:true,opacity:.62,emissive:0x183a2a,emissiveIntensity:.45});
+  const isPistol=def.platform==="pistol",isShotgun=def.platform==="shotgun",isLMG=def.platform==="lmg",isDMR=def.platform==="dmr",isSMG=def.platform==="smg",isCarbine=def.platform==="carbine";
+  const bodyLength=isPistol?.38:isShotgun?.78:isLMG?.78:isDMR?.68:isSMG?.52:isCarbine?.55:.63;
+  const bodyHeight=isPistol?.17:isLMG?.24:.2;
+  // Each platform has a distinct silhouette: compact sidearm, tube-fed shotgun,
+  // box-fed support weapon, long marksman frame, SMG receiver or carbine.
+  box(g,isPistol?.19:isLMG?.3:.24,bodyHeight,bodyLength,receiver,0,0,0);
+  box(g,isPistol?.18:.23,isPistol?.1:.13,isPistol?.14:.3,dark,0,.11,-.16);
+  box(g,isPistol?.18:.22,isPistol?.13:.18,isPistol?.13:.22,receiver,0,-.02,isPistol?.2:.42);
+  if(!isPistol){
+    const stockLen=isShotgun?.45:isLMG?.38:isDMR?.43:.34;
+    box(g,.19,.16,stockLen,dark,0,.01,.55+stockLen*.25);
+    box(g,.22,.22,.07,rubber,0,-.015,.78+stockLen*.25);
+  }else{
+    box(g,.18,.1,.16,rubber,0,.005,.31);
+    box(g,.12,.08,.08,dark,0,.09,.22);
+  }
+  const grip=box(g,isPistol?.12:.13,isPistol?.28:.34,.16,rubber,0,-.21,.2);grip.rotation.x=-.18;
+  if(isShotgun){
+    // Broad pump for the shotgun silhouette and a long auxiliary tube under the barrel.
+    box(g,.22,.16,.5,receiver,0,-.01,-.48);
+    const tube=new THREE.Mesh(new THREE.CylinderGeometry(.045,.045,.78,12),dark);tube.rotation.x=Math.PI/2;tube.position.set(0,-.13,-.82);g.add(tube);
+    for(let i=0;i<4;i++)box(g,.24,.035,.045,steel,0,-.02,-.34-i*.105,false);
+  }else if(isLMG){
+    // Wider feed cover and a large side box magazine.
+    box(g,.31,.16,.42,dark,0,.12,-.12);
+    box(g,.27,.39,.28,rubber,.2,-.25,.02);
+    for(let i=0;i<4;i++)box(g,.018,.04,.2,steel,.342,-.12+i*.07,.02,false);
+  }else{
+    const magH=isPistol?.3:isDMR?.43:isSMG?.32:isCarbine?.34:.38,magW=isPistol?.12:isSMG?.14:.18;
+    const mag=box(g,magW,magH,.22,dark,0,-.29,-.08);mag.rotation.x=-.12;
+    for(let i=0;i<5;i++)box(g,magW+.01,.014,.012,steel,0,-.13-i*.054,-.195,false);
+  }
+  // Forward shroud and a unique length for each platform.
+  const forwardLen=isPistol?.25:isShotgun?.78:isDMR?.66:isLMG?.62:isSMG?.4:isCarbine?.42:.48;
+  box(g,isPistol?.17:.2,.15,forwardLen,receiver,0,.015,-.47-forwardLen*.17);
+  const barrelLen=isPistol?.36:isShotgun?.88:isDMR?.92:isLMG?.82:isSMG?.5:isCarbine?.58:.7;
+  const barrel=new THREE.Mesh(new THREE.CylinderGeometry(.035,.045,barrelLen,14),steel);barrel.rotation.x=Math.PI/2;barrel.position.set(0,.02,-.68-barrelLen*.5);g.add(barrel);
+  const muzzle=new THREE.Mesh(new THREE.CylinderGeometry(.052,.04,.13,14),dark);muzzle.rotation.x=Math.PI/2;muzzle.position.set(0,.02,-.68-barrelLen-.04);g.add(muzzle);
+  if(isShotgun){
+    const front=new THREE.Mesh(new THREE.CylinderGeometry(.062,.062,.85,12),rubber);front.rotation.x=Math.PI/2;front.position.set(0,-.12,-.95);g.add(front);
+    for(let i=0;i<3;i++)box(g,.26,.04,.04,dark,0,-.03,-.66-i*.13);
+  }
+  if(isPistol){
+    box(g,.17,.07,.28,dark,0,.13,-.12);
+    box(g,.035,.045,.07,steel,0,.19,-.19);
+  }else{
+    box(g,.27,.06,.16,dark,0,.13,-.54);
+    box(g,.22,.035,.74,dark,0,.14,-.08);
+    for(let i=0;i<7;i++)box(g,.23,.012,.035,steel,0,.165,.18-i*.09,false);
+  }
+  for(const side of [-1,1]){
     box(g,.025,.07,.27,dark,side*.13,.02,-.58);
-    for(let i=0;i<5;i++){const screw=new THREE.Mesh(new THREE.CylinderGeometry(.012,.012,.012,8),steel);screw.rotation.z=Math.PI/2;screw.position.set(side*.145,.035,.14-i*.07);g.add(screw);}
+    for(let i=0;i<(isPistol?3:5);i++){const screw=new THREE.Mesh(new THREE.CylinderGeometry(.012,.012,.012,8),steel);screw.rotation.z=Math.PI/2;screw.position.set(side*.145,.035,.14-i*.07);g.add(screw);}
     for(let i=0;i<4;i++)box(g,.012,.045,.025,steel,side*.133,.04,-.36-i*.06,false);
   }
-  const sight=new THREE.Group();sight.position.set(0,.23,-.1);g.add(sight);g.userData.sight=sight;
+  // Individual optic assemblies. The armory and ADS overlay use the same optic profile.
+  const sight=new THREE.Group();sight.position.set(0,isPistol?.17:.23,-.1);g.add(sight);g.userData.sight=sight;
+  const makeRing=(radius,tube,z=0)=>{const m=new THREE.Mesh(new THREE.TorusGeometry(radius,tube,8,24),steel);m.position.z=z;sight.add(m);return m;};
   if(def.opticType==="reflex"){
-    box(sight,.19,.14,.05,dark,0,0,0);
-    box(sight,.135,.085,.012,lens,0,.012,-.03);
-    const rim=new THREE.Mesh(new THREE.TorusGeometry(.08,.012,8,24),steel);rim.position.set(0,.012,-.04);sight.add(rim);
+    box(sight,.19,.14,.05,dark,0,0,0);box(sight,.135,.085,.012,lens,0,.012,-.03);makeRing(.08,.012,-.04);
     const dot=new THREE.Mesh(new THREE.SphereGeometry(.011,8,8),new THREE.MeshBasicMaterial({color:0xff5e54}));dot.position.set(0,.012,-.049);sight.add(dot);
   }else if(def.opticType==="holo"){
-    box(sight,.2,.18,.065,dark,0,0,0);
-    box(sight,.14,.125,.012,lens,0,.015,-.04);
+    box(sight,.2,.18,.065,dark,0,0,0);box(sight,.14,.125,.012,lens,0,.015,-.04);
     const ring=new THREE.Mesh(new THREE.RingGeometry(.026,.032,24),new THREE.MeshBasicMaterial({color:0xff6256}));ring.position.set(0,.015,-.05);sight.add(ring);
     const dot=new THREE.Mesh(new THREE.CircleGeometry(.007,12),new THREE.MeshBasicMaterial({color:0xff6256}));dot.position.set(0,.015,-.052);sight.add(dot);
-  }else{
-    const tube=new THREE.Mesh(new THREE.CylinderGeometry(.068,.068,.46,18),dark);tube.rotation.x=Math.PI/2;sight.add(tube);
-    for(const z of [-.19,.19]){const rim=new THREE.Mesh(new THREE.TorusGeometry(.078,.018,8,24),steel);rim.position.z=z;sight.add(rim);}
-    const glass=new THREE.Mesh(new THREE.CircleGeometry(.062,24),lens);glass.position.z=-.205;sight.add(glass);
+  }else if(def.opticType==="scope"||def.opticType==="lpvo"){
+    const len=def.opticType==="scope"?.5:.37;
+    const tube=new THREE.Mesh(new THREE.CylinderGeometry(.068,.068,len,18),dark);tube.rotation.x=Math.PI/2;sight.add(tube);
+    makeRing(.078,.018,-len*.5);makeRing(.078,.018,len*.5);
+    const glass=new THREE.Mesh(new THREE.CircleGeometry(.062,24),lens);glass.position.z=-len*.5-.01;sight.add(glass);
     const turret=box(sight,.1,.1,.12,steel,0,.08,0);turret.rotation.z=.2;
-    const focus=new THREE.Mesh(new THREE.TorusGeometry(.078,.01,8,24),dark);focus.position.z=.22;sight.add(focus);
+    if(def.opticType==="lpvo"){const adjust=box(sight,.16,.065,.1,dark,0,-.075,.05);adjust.rotation.z=.1;}
+  }else if(def.opticType==="prism"){
+    box(sight,.22,.2,.25,dark,0,0,0);
+    box(sight,.16,.13,.012,lens,0,.015,-.13);
+    makeRing(.085,.012,-.145);
+    const chevron=new THREE.Mesh(new THREE.BufferGeometry().setFromPoints([new THREE.Vector3(-.025,-.015,-.15),new THREE.Vector3(0,.025,-.15),new THREE.Vector3(.025,-.015,-.15)]),new THREE.LineBasicMaterial({color:0xff6457}));sight.add(chevron);
+  }else if(def.opticType==="combat"){
+    box(sight,.22,.17,.16,dark,0,0,0);box(sight,.16,.1,.012,lens,0,.015,-.09);makeRing(.084,.014,-.1);
+    const guard=box(sight,.025,.23,.08,steel,0,.01,.02);guard.position.x=-.12;
+  }else if(def.opticType==="micro"){
+    box(sight,.13,.095,.085,dark,0,0,0);box(sight,.085,.052,.012,lens,0,.01,-.05);
+    makeRing(.045,.009,-.055);
+    const dot=new THREE.Mesh(new THREE.SphereGeometry(.008,8,8),new THREE.MeshBasicMaterial({color:0xff6657}));dot.position.set(0,.01,-.06);sight.add(dot);
   }
-  // Subtle sling loop and lower attachment.
-  const sling=new THREE.Mesh(new THREE.TorusGeometry(.2,.014,6,24,Math.PI),rubber);sling.position.set(.11,-.09,.36);sling.rotation.z=Math.PI/2;g.add(sling);
+  // Handguard attachment and sling details.
+  if(!isPistol){
+    const sling=new THREE.Mesh(new THREE.TorusGeometry(.2,.014,6,24,Math.PI),rubber);sling.position.set(.11,-.09,.36);sling.rotation.z=Math.PI/2;g.add(sling);
+  }
   return g;
 }
-
 function createInfected(boss=false){
   const root=new THREE.Group(),skin=material(boss?0x515a48:0x68745e,.95),darkSkin=material(0x354239,.9);
   const shirt=new THREE.MeshStandardMaterial({color:boss?0x30372f:0x3a493d,roughness:.96,map:cloth});
