@@ -196,7 +196,7 @@ function buildPreviewModel(){
 }
 function equipWeapon(){
   if(state.weaponModel){state.camera.remove(state.weaponModel);dispose(state.weaponModel);}
-  const model=createWeapon(WEAPONS[state.selectedWeapon]);model.name="held-weapon";model.scale.setScalar(.5);model.position.set(.3,-.27,-.55);model.rotation.set(0,Math.PI,0);
+  const model=createWeapon(WEAPONS[state.selectedWeapon]);model.name="held-weapon";model.scale.setScalar(.5);model.position.set(.3,-.27,-.55);model.rotation.set(0,0,0);
   state.camera.add(model);state.weaponModel=model;updateWeaponHud();
 }
 function updateWeaponHud(){
@@ -358,7 +358,7 @@ function aim(on){
   $("scope-overlay").classList.toggle("scope-reflex",on&&w.opticType==="reflex");
   $("scope-overlay").classList.toggle("scope-holo",on&&w.opticType==="holo");
   state.camera.fov=on?76/zoom:76;state.camera.updateProjectionMatrix();
-  if(state.weaponModel){state.weaponModel.position.x=on?.05:.3;state.weaponModel.position.y=on?-.2:-.27;}
+  if(state.weaponModel){state.weaponModel.position.x=on ? 0.05 : 0.3;state.weaponModel.position.y=on ? -0.2 : -0.27;}
 }
 function movePlayer(dt){
   const p=state.player;let mx=0,mz=0;
