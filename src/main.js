@@ -243,7 +243,7 @@ function resetPlayer(startX=0,startZ=7){
   updateWeaponInfo();equipWeaponInHands();updatePlayerHud();
 }
 function startGame(mode="solo"){
-  cleanupNetwork();state.mode=mode;state.running=true;state.paused=false;state.gameOver=false;
+  if(mode==="solo")cleanupNetwork();state.mode=mode;state.running=true;state.paused=false;state.gameOver=false;
   clearScene();addArena();resetPlayer(mode==="guest"?2.5:0,mode==="guest"?7:7);
   $("main-menu").classList.add("hidden");$("armory-screen").classList.add("hidden");$("intel-screen").classList.add("hidden");$("hud").classList.remove("hidden");
   $("network-mode").textContent=mode==="solo"?"SOLO SESSION":mode==="host"?"HOST / SQUAD LINK":"CONNECTED GUEST";
@@ -312,7 +312,7 @@ function updateEnemies(dt,time){
       e.attackAt=time+(e.boss?1.2:1.45);
       if(target.id==="HOST")damageLocalPlayer(e.damage);
       else{
-        const p=state.networkPlayers.get(target.id);if(p){p.hp=Math.max(0,p.hp-e.damage);const c=state.connections.get(target.id);if(c?.open)c.send({type:"damage",hp:p.hp,amount:e.damage});}
+        const p=state.networkPlayers.get(target.id);if(p){p.hp=Math.max(0,p.hp-e.damage);const c=state.connections.get(target.id);if(c?.open)c.send({type:"damage",hp:p.hp,amount:e.damage});checkSquadEliminated();}
       }
     }
   }
@@ -453,6 +453,7 @@ function startGuestWorld(){
   $("main-menu").classList.add("hidden");$("hud").classList.remove("hidden");$("network-mode").textContent="CONNECTED GUEST";$("connection-label").textContent="SQUAD LINK ONLINE";
 }
 function setupHostPeer(){
+  cleanupNetwork();
   if(!window.Peer){setNetworkStatus("PeerJS failed to load. Try reloading the page.");return;}
   const room="dead-signal-"+Math.random().toString(36).slice(2,10);
   const peer=new window.Peer(room,{debug:0});state.peer=peer;
@@ -487,6 +488,7 @@ function joinPeerRoom(code){
       if(data.type==="full"){setNetworkStatus("This squad room already has four operators.");conn.close();return;}
       if(data.type==="snapshot")applySnapshot(data);
       if(data.type==="damage"){state.player.hp=data.hp;updatePlayerHud();$("damage-vignette").classList.add("active");setTimeout(()=>$("damage-vignette").classList.remove("active"),160);if(state.player.hp<=0)showToast("OPERATOR DOWN // WAIT FOR SQUAD");}
+      if(data.type==="gameover"){state.running=false;state.gameOver=true;document.exitPointerLock?.();$("final-stats").textContent="The squad was overrun on wave "+data.wave+"."; $("game-over").classList.remove("hidden");}
     });
     conn.on("close",()=>{showToast("HOST CONNECTION LOST");state.running=false;$("hud").classList.add("hidden");setView("menu");});
     conn.on("error",()=>setNetworkStatus("Could not connect. Check the room code and try again."));
@@ -549,14 +551,14 @@ function bindMenu(){
   $("play-solo").addEventListener("click",()=>{startGame("solo");});
   $("nav-deploy").addEventListener("click",()=>$("play-solo").click());
   $("host-game").addEventListener("click",setupHostPeer);
-  $("join-game").addEventListener("click",()=>{const code=$("room-code").value.trim();if(!code){setNetworkStatus("Enter the host room code first.");return;}joinPeerRoom(code);});
+  $("join-game").addEventListener("click",()=>{const code=$("room-code").value.trim();if(!code){setNetworkStatus("Enter the host room code first.");return;}joinPeerRoom(code.toLowerCase());});
   $("copy-code").addEventListener("click",async()=>{try{await navigator.clipboard.writeText($("host-code").textContent);setNetworkStatus("Room code copied. Send it to your squad.");}catch{setNetworkStatus("Select and copy the room code manually.");}});
   $("nav-arsenal").addEventListener("click",()=>{setView("armory");updateWeaponInfo();resizePreview();});
   $("nav-intel").addEventListener("click",()=>setView("intel"));
   document.querySelectorAll("[data-back]").forEach(b=>b.addEventListener("click",()=>setView("menu")));
   $("equip-weapon").addEventListener("click",()=>{setView("menu");showToast(WEAPONS[state.selectedWeapon].name+" READY FOR DEPLOYMENT");});
   $("resume-button").addEventListener("click",resumeGame);$("leave-button").addEventListener("click",returnToMenu);
-  $("retry-button").addEventListener("click",()=>{const mode=state.mode;cleanupNetwork();startGame(mode==="guest"?"solo":mode);});
+  $("retry-button").addEventListener("click",()=>{const mode=state.mode;cleanupNetwork();if(mode==="host")setupHostPeer();else startGame("solo");});
   $("menu-button").addEventListener("click",returnToMenu);
 }
 function animate(){
